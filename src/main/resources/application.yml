@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: QueryMate
+  threads:
+    virtual:
+      enabled: true
+
+# Default connection settings (can be overridden via CLI)
+querymate:
+  ollama:
+    base-url: http://localhost:11434
+    model: llama3.2
+    timeout-seconds: 60
