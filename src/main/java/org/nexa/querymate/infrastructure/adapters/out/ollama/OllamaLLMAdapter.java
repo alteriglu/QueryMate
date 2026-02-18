@@ -45,11 +45,9 @@ public class OllamaLLMAdapter implements LLMPort {
     private final WebClient webClient;
     private final OllamaProperties properties;
 
-    public OllamaLLMAdapter(OllamaProperties properties) {
+    public OllamaLLMAdapter(WebClient ollamaWebClient, OllamaProperties properties) {
+        this.webClient = ollamaWebClient;
         this.properties = properties;
-        this.webClient = WebClient.builder()
-                .baseUrl(properties.baseUrl())
-                .build();
     }
 
     @Override

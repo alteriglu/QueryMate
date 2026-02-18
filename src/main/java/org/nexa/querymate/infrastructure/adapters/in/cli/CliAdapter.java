@@ -134,7 +134,7 @@ public class CliAdapter implements CommandLineRunner {
     }
 
     private ConnectionConfig parseConnectionString(String connectionString, String username, String password) {
-        // Format: host:port/database
+        // Format: host:port/database or host/database (port defaults to 5432)
         String host;
         int port = 5432;
         String database;
@@ -145,14 +145,32 @@ public class CliAdapter implements CommandLineRunner {
         }
 
         database = connectionString.substring(slashIdx + 1);
+        if (database.isBlank()) {
+            throw new IllegalArgumentException("Database name cannot be empty");
+        }
+
         String hostPort = connectionString.substring(0, slashIdx);
+        if (hostPort.isBlank()) {
+            throw new IllegalArgumentException("Host cannot be empty");
+        }
 
         int colonIdx = hostPort.indexOf(':');
         if (colonIdx == -1) {
             host = hostPort;
         } else {
             host = hostPort.substring(0, colonIdx);
-            port = Integer.parseInt(hostPort.substring(colonIdx + 1));
+            if (host.isBlank()) {
+                throw new IllegalArgumentException("Host cannot be empty");
+            }
+            String portStr = hostPort.substring(colonIdx + 1);
+            try {
+                port = Integer.parseInt(portStr);
+                if (port <= 0 || port > 65535) {
+                    throw new IllegalArgumentException("Port must be between 1 and 65535, got: " + port);
+                }
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Invalid port number: '" + portStr + "'");
+            }
         }
 
         return new ConnectionConfig(host, port, database, username, password);
